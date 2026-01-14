@@ -1,0 +1,96 @@
+<div class="p-4 text-white animate-fade-in">
+  <header class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold">Live Signals</h1>
+      <p class="text-gray-400">AI-Generated Opportunities</p>
+    </div>
+    <div class="relative">
+      <span class="absolute h-3 w-3 top-0 right-0">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+      </span>
+      <p class="pr-4 text-green-400 font-semibold">LIVE</p>
+    </div>
+  </header>
+
+  @if (isLoading() && signals().length === 0) {
+    <div class="text-center py-10">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400 mx-auto"></div>
+      <p class="mt-4 text-gray-400">Searching for high-probability signals...</p>
+    </div>
+  } @else if (error()) {
+    <div class="bg-red-500/20 border border-red-500/50 text-red-300 p-4 rounded-lg">
+      <p class="font-bold">An Error Occurred</p>
+      <p class="text-sm">{{ error() }}</p>
+    </div>
+  } @else if (signals().length === 0) {
+    <div class="text-center py-10">
+      <p class="text-gray-500">No active signals found. The market may be calm.</p>
+    </div>
+  } @else {
+    <div class="space-y-4">
+      @for(signal of signals(); track signal.asset) {
+        <div class="bg-gray-800/50 border border-gray-700 rounded-lg p-4 flex items-center justify-between animate-fade-in-up">
+          <div class="flex items-center">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4" [class]="signal.type === 'CALL' ? 'bg-green-500/20' : 'bg-red-500/20'">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" [class]="signal.type === 'CALL' ? 'text-green-400' : 'text-red-500'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                @if (signal.type === 'CALL') {
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                } @else {
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                }
+              </svg>
+            </div>
+            <div>
+              <p class="text-lg font-bold">{{ signal.asset }} - <span [class]="signal.type === 'CALL' ? 'text-green-400' : 'text-red-500'">{{ signal.type }}</span></p>
+              <p class="text-xs text-gray-400">{{ signal.strategy }} on {{ signal.timeframe }}</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="text-lg font-bold text-blue-400">{{ signal.probability }}%</p>
+            <p class="text-xs text-gray-400">Probability</p>
+          </div>
+          <button (click)="openTradeModal(signal)" class="ml-4 px-4 py-2 rounded-lg text-black font-bold transition-transform transform hover:scale-105" [class]="signal.type === 'CALL' ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'">
+            ENTER
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Trade Modal -->
+@if (isModalOpen() && selectedSignal(); as signal) {
+  <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fade-in">
+    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 w-full max-w-sm m-4">
+      <h2 class="text-xl font-bold mb-1">Confirm Trade</h2>
+      <p class="text-gray-400 mb-4">You are about to place a trade on {{ signal.asset }}.</p>
+      
+      <div class="bg-gray-900 rounded-lg p-4 mb-4 text-center">
+        <p class="text-2xl font-bold" [class]="signal.type === 'CALL' ? 'text-green-400' : 'text-red-500'">{{ signal.type }}</p>
+        <p class="text-lg font-semibold">{{ signal.asset }}</p>
+        <p class="text-sm text-gray-400">{{ signal.timeframe }} | {{ signal.probability }}% Prob.</p>
+      </div>
+
+      <div class="mb-4">
+        <label for="amount" class="block text-gray-400 text-sm font-bold mb-2">Trade Amount ($)</label>
+        <input 
+          id="amount" 
+          [value]="tradeAmount()"
+          (input)="updateAmount($event)"
+          class="bg-gray-700 appearance-none border-2 border-gray-600 rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:bg-gray-600 focus:border-green-500 transition-colors" 
+          type="number" 
+          step="1"
+          min="1"
+          [max]="brokerService.balance()">
+      </div>
+      
+      <div class="flex justify-end space-x-3 mt-6">
+        <button (click)="closeModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-700 text-white font-semibold transition">Cancel</button>
+        <button (click)="confirmTrade()" class="px-4 py-2 rounded-lg text-black font-bold transition" [class]="signal.type === 'CALL' ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'">
+          Confirm {{ signal.type }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,106 @@
+
+<div class="p-4 text-white animate-fade-in space-y-8">
+  <header>
+    <h1 class="text-2xl font-bold">Settings</h1>
+    <p class="text-gray-400">Manage your account and connections.</p>
+  </header>
+
+  <!-- Broker Connection Section -->
+  <div class="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
+    <h2 class="text-lg font-semibold mb-3">Broker Connection</h2>
+    @if (connectedBroker()) {
+      <div class="flex items-center justify-between">
+        <p>Connected to: <span class="font-bold text-green-400">{{ connectedBroker() }}</span></p>
+        <button (click)="disconnect()" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold text-sm transition">
+          Disconnect
+        </button>
+      </div>
+    } @else {
+      <div class="space-y-4">
+        <p class="text-sm text-gray-400">Connect to a broker to sync your trades. (This is a simulation).</p>
+        <div>
+          <label for="broker-select" class="block text-gray-400 text-sm font-bold mb-2">Select Broker:</label>
+          <select id="broker-select" (change)="updateSelectedBroker($event)" class="bg-gray-700 border-2 border-gray-600 rounded w-full py-2 px-3 text-gray-200 focus:outline-none focus:bg-gray-600 focus:border-green-500">
+            @for (broker of brokers; track broker) {
+              <option [value]="broker">{{ broker }}</option>
+            }
+          </select>
+        </div>
+        <button (click)="openBrokerLoginModal()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition flex items-center justify-center">
+          Connect
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Account Type Section -->
+  @if (connectedBroker()) {
+    <div class="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
+      <h2 class="text-lg font-semibold mb-3">Account Type</h2>
+      <div class="flex space-x-2">
+        <button (click)="changeAccountType('DEMO')" 
+                class="w-1/2 py-3 rounded-lg font-bold transition"
+                [class]="accountType() === 'DEMO' ? 'bg-green-500 text-black' : 'bg-gray-700 text-white hover:bg-gray-600'">
+          Demo
+        </button>
+        <button (click)="changeAccountType('REAL')" 
+                class="w-1/2 py-3 rounded-lg font-bold transition"
+                [class]="accountType() === 'REAL' ? 'bg-green-500 text-black' : 'bg-gray-700 text-white hover:bg-gray-600'">
+          Real
+        </button>
+      </div>
+      <p class="text-xs text-gray-500 mt-2 text-center">Switching accounts will reset your balance for that type.</p>
+    </div>
+  }
+
+  <!-- Logout Button -->
+  <div class="pt-4 border-t border-gray-800">
+     <button (click)="logout()" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition">
+      Logout
+    </button>
+  </div>
+</div>
+
+<!-- Broker Login Modal -->
+@if (isBrokerLoginOpen()) {
+  <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fade-in">
+    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 w-full max-w-sm m-4">
+      <h2 class="text-xl font-bold mb-2">Login to {{ selectedBroker() }}</h2>
+      <p class="text-gray-400 mb-6">Enter your broker credentials to connect.</p>
+      
+      <div class="space-y-4">
+        <div>
+          <label for="broker-username" class="block text-gray-400 text-sm font-bold mb-2">Username</label>
+          <input 
+            id="broker-username" 
+            [value]="brokerUsername()"
+            (input)="updateBrokerUsername($event)"
+            class="bg-gray-700 appearance-none border-2 border-gray-600 rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:bg-gray-600 focus:border-green-500 transition-colors" 
+            type="text" 
+            placeholder="your_broker_username">
+        </div>
+        <div>
+          <label for="broker-password" class="block text-gray-400 text-sm font-bold mb-2">Password</label>
+          <input 
+            id="broker-password" 
+            [value]="brokerPassword()"
+            (input)="updateBrokerPassword($event)"
+            class="bg-gray-700 appearance-none border-2 border-gray-600 rounded w-full py-2 px-3 text-gray-200 leading-tight focus:outline-none focus:bg-gray-600 focus:border-green-500 transition-colors" 
+            type="password" 
+            placeholder="******************">
+        </div>
+      </div>
+      
+      <div class="flex justify-end space-x-3 mt-8">
+        <button (click)="closeBrokerLoginModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-700 text-white font-semibold transition">Cancel</button>
+        <button (click)="handleBrokerLogin()" [disabled]="isConnecting()" class="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-bold transition w-28 flex items-center justify-center">
+          @if (isConnecting()) {
+            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+          } @else {
+            <span>Login</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

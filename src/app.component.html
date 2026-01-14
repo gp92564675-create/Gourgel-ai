@@ -1,0 +1,9 @@
+<div class="h-screen w-screen bg-gray-900 flex justify-center items-center font-sans">
+  <div class="relative w-full sm:w-[400px] h-full sm:h-[800px] sm:max-h-[90vh] bg-black sm:rounded-3xl shadow-2xl shadow-green-500/10 overflow-hidden flex flex-col">
+    @if (isAuthenticated()) {
+      <app-main-view />
+    } @else {
+      <app-login />
+    }
+  </div>
+</div>

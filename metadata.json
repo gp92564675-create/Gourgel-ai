@@ -1,0 +1,5 @@
+{
+  "name": "Gourgel AI Signals",
+  "description": "A sophisticated trading signals application for binary options, leveraging AI-generated high-probability signals. This app provides a professional, dark-themed interface for monitoring the market, receiving signals, and managing trades with integrated risk management features.",
+  "requestFramePermissions": []
+}

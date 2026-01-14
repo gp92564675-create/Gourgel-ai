@@ -1,0 +1,27 @@
+
+<div class="h-full w-full bg-black flex flex-col">
+  <main class="flex-grow overflow-y-auto">
+    @switch (activeView()) {
+      @case ('dashboard') {
+        <app-dashboard />
+      }
+      @case ('signals') {
+        <app-signals />
+      }
+      @case ('history') {
+        <app-history />
+      }
+      @case ('settings') {
+        <app-settings />
+      }
+    }
+  </main>
+
+  <footer class="flex-shrink-0">
+    <app-bottom-nav [activeView]="activeView()" (viewChange)="onViewChange($event)" />
+  </footer>
+  
+  <div class="text-center p-2 bg-gray-900 text-gray-500 text-xs border-t border-gray-800">
+    <p>Disclaimer: Trading involves substantial risk and is not suitable for every investor. This app does not guarantee profits.</p>
+  </div>
+</div>

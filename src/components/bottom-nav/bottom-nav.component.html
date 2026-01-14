@@ -1,0 +1,13 @@
+
+<div class="w-full bg-gray-900 border-t border-gray-800">
+  <div class="flex justify-around items-center h-16">
+    @for (item of navItems; track item.id) {
+      <button (click)="changeView(item.id)" class="flex flex-col items-center justify-center w-1/4 h-full text-gray-400 hover:text-green-400 transition-colors duration-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" [class.text-green-400]="activeView() === item.id" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.icon" />
+        </svg>
+        <span class="text-xs font-medium" [class.text-green-400]="activeView() === item.id">{{ item.label }}</span>
+      </button>
+    }
+  </div>
+</div>
